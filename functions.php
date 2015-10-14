@@ -12,6 +12,7 @@ setup();
 
 class RooftopCMS {
     static function addContentType($type, $args = null) {
+        $sanitised = str_replace(" ","_",strtolower($type));
         $default_args = array(
             'hierarchical' => false,
             'labels' => array(
@@ -49,10 +50,11 @@ class RooftopCMS {
             $args = array_merge($default_args, $args);
         }
 
-        register_post_type($type.'s', $args);
+        register_post_type($sanitised, $args);
     }
 
     static function addTaxonomy($name, $content_type, $args = null) {
+        $sanitised_name = str_replace(" ","_",strtolower($name));
         $default_args = array(
             'name' => $name,
             'singular_name' => $name,
@@ -92,8 +94,10 @@ class RooftopCMS {
         }
 
         foreach($types as $key => $type) {
-            register_taxonomy($name, $type, $args);
+            $sanitised_type = str_replace(" ","_",strtolower($content_type));
+            register_taxonomy($sanitised_name, $sanitised_type, $args);
         }
     }
+
 }
 ?>
