@@ -87,6 +87,8 @@ class RooftopCMS {
                 'choose_from_most_used' => "Most used $plural",
                 'not_found' => "No $plural found"
             ),
+            'show_in_rest' => true,
+            'query_var' => true
         );
 
         if(is_null($args) || !is_array($args)){
