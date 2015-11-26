@@ -8,6 +8,12 @@ function setup() {
         'main' => __('Main Menu',      'rooftopcms'),
         'footer'  => __('Footer Menu', 'rooftopcms'),
     ));
+
+    // set the default Rooftop cache time (configured here rather than in the plugin itself which should have a generic config)
+    add_filter('rooftop_response_header_options', function($options) {
+        $options['cache_max_age_seconds'] = 60*10; // 10 mins
+        return $options;
+    });
 }
 setup();
 
