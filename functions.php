@@ -14,6 +14,18 @@ function setup() {
         $options['cache_max_age_seconds'] = 60*10; // 10 mins
         return $options;
     });
+
+    add_filter( 'rest_query_vars', function( $valid_vars ) {
+        $valid_vars = array_merge( $valid_vars, array( 'post__in', 'post__not_in' ) );
+
+        return $valid_vars;
+    });
+
+    add_filter ( 'rest_query_vars', function( $valid_vars ) {
+        $valid_vars = array_merge( $valid_vars, array( 'meta_key', 'meta_value', 'meta_query' ) );
+
+        return $valid_vars;
+    });
 }
 setup();
 
