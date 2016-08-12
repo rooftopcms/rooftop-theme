@@ -7,28 +7,52 @@ function setup() {
         'main' => __('Main Menu',      'rooftopcms'),
         'footer'  => __('Footer Menu', 'rooftopcms'),
     ));
+
+    // set the default Rooftop cache time (configured here rather than in the plugin itself which should have a generic config)
+    add_filter('rooftop_response_header_options', function($options) {
+        $options['cache_max_age_seconds'] = 60*10; // 10 mins
+        return $options;
+    });
+
+    // FIXME: move these rest_query_vars filters into the rooftop-request-parser plugin
+    add_filter( 'rest_query_vars', function( $valid_vars ) {
+        $valid_vars = array_merge( $valid_vars, array( 'post__in', 'post__not_in' ) );
+
+        return $valid_vars;
+    });
+
+    add_filter ( 'rest_query_vars', function( $valid_vars ) {
+        $valid_vars = array_merge( $valid_vars, array( 'meta_key', 'meta_value', 'meta_query' ) );
+
+        return $valid_vars;
+    });
 }
 setup();
 
+use ICanBoogie\Inflector;
 class RooftopCMS {
     static function addContentType($type, $args = null) {
+        $inflector = ICanBoogie\Inflector::get('en');
+        $sanitised = str_replace(" ","_",strtolower($type));
+        $singular = $inflector->titleize($type);
+        $plural = $inflector->pluralize($singular);
         $default_args = array(
             'hierarchical' => false,
             'labels' => array(
-                'name' => "${type}s",
-                'singular_name' => $type,
-                'menu_name' => "${type}s",
-                'name_admin_bar' => $type,
-                'all_items' => "All ${type}s",
-                'add_new' => "New $type",
-                'add_new_item' => "New $type",
-                'edit_item' => "Edit $type",
-                'new_item' => "New $type",
-                'view_item' => "View $type",
-                'search_items' => "Search $type",
-                'not_found' => "No $type found",
-                'not_found_in_trash' => "No $type found in trash",
-                'parent_item_colon' => "Parent $type:"
+                'name' => $plural,
+                'singular_name' => $singular,
+                'menu_name' => $plural,
+                'name_admin_bar' => $singular,
+                'all_items' => "All $plural",
+                'add_new' => "New $singular",
+                'add_new_item' => "New $singular",
+                'edit_item' => "Edit $singular",
+                'new_item' => "New $singular",
+                'view_item' => "View $singular",
+                'search_items' => "Search $plural",
+                'not_found' => "No $plural found",
+                'not_found_in_trash' => "No $plural found in trash",
+                'parent_item_colon' => "Parent $singular:"
             ),
             'description' => "A $type",
             'public' => true,
@@ -40,6 +64,7 @@ class RooftopCMS {
             'capability_type' => 'page',
             'has_archive' => true,
             'show_in_rest' => true,
+            'rest_base' => $inflector->underscore($inflector->pluralize($type)),
             'include_taxonomies_in_response' => true
         );
 
@@ -49,32 +74,39 @@ class RooftopCMS {
             $args = array_merge($default_args, $args);
         }
 
-        register_post_type($type.'s', $args);
+        register_post_type($sanitised, $args);
     }
 
     static function addTaxonomy($name, $content_type, $args = null) {
+        $inflector = ICanBoogie\Inflector::get('en');
+        $sanitised = str_replace(" ","_",strtolower($name));
+        $human = $inflector->titleize($sanitised);
+        $plural = $inflector->pluralize($human);
+        $singular = $inflector->singularize($human);
         $default_args = array(
-            'name' => $name,
-            'singular_name' => $name,
+            'name' => $plural,
+            'singular_name' => $singular,
             'labels' => array(
-                'name' => $name,
-                'singular_name' => $name,
-                'menu_name' => $name,
-                'all_items' => "All $name",
-                'edit_item' => "Edit $name",
-                'view_item' => "View $name",
-                'update_item' => "Update $name",
-                'add_new_item' => "Add new $name",
-                'new_item_name' => "New $name name",
-                'parent_item' => "Parent $name",
-                'parent_item_colon' => "Parent $name:",
-                'search_items' => "Search $name",
-                'popular_items' => "Popular $name",
-                'separate_items_with_commas' => "Separate ${name}s with commas",
-                'add_or_remove_items' => "Add or remove ${name}s",
-                'choose_from_most_used' => "Most used ${name}s",
-                'not_found' => "No $name found"
+                'name' => $plural,
+                'singular_name' => $singular,
+                'menu_name' => $plural,
+                'all_items' => "All $plural",
+                'edit_item' => "Edit $singular",
+                'view_item' => "View $singular",
+                'update_item' => "Update $singular",
+                'add_new_item' => "Add new $singular",
+                'new_item_name' => "New $singular name",
+                'parent_item' => "Parent $singular",
+                'parent_item_colon' => "Parent $singular:",
+                'search_items' => "Search $plural",
+                'popular_items' => "Popular $plural",
+                'separate_items_with_commas' => "Separate $plural with commas",
+                'add_or_remove_items' => "Add or remove $plural",
+                'choose_from_most_used' => "Most used $plural",
+                'not_found' => "No $plural found"
             ),
+            'show_in_rest' => true,
+            'query_var' => true
         );
 
         if(is_null($args) || !is_array($args)){
@@ -92,7 +124,7 @@ class RooftopCMS {
         }
 
         foreach($types as $key => $type) {
-            register_taxonomy($name, $type, $args);
+            register_taxonomy($sanitised, $type, $args);
         }
     }
 }
