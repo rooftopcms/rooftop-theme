@@ -1,0 +1,20 @@
+{
+    "name": "rooftopcms/rooftop-theme",
+    "description": "Appearance and menu options",
+    "license": "GPL-3.0",
+    "authors": [
+        {
+            "name": "Rooftop CMS",
+            "email": "hello@rooftopcms.com"
+        }
+    ],
+    "repositories": [
+        {
+            "type": "composer",
+            "url": "http://wpackagist.org"
+        }
+    ],
+    "type": "wordpress-theme",
+    "require": {
+    }
+}
