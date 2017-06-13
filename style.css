@@ -10,3 +10,35 @@ License URI: http://www.gnu.org/licenses/gpl-3.0.html
 Tags: rooftop
 Text Domain: rooftopcms
 */
+
+
+body {
+    padding: 10px 50px;
+}
+
+body.with-admin-bar {
+}
+
+body.root-page .postbox-container {
+    margin-right: 20px;
+}
+
+body.root-page .postbox-container h3,
+body.root-page .postbox-container .inside {
+    padding: 0;
+}
+
+body.root-page .postbox-container {
+    background: #fff;
+    border: 1px solid #eee;
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.04);
+}
+body.root-page .postbox-container h3 {
+    border-bottom: 1px solid #eee;
+    font-size: 14px;
+    padding: 0 8px 8px 12px;
+    margin-top: 8px
+}
+body.root-page .postbox-container .inside {
+    padding: 0 12px 11px;
+}
