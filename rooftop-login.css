@@ -23,3 +23,8 @@ body.env-dr div#login p#nav,
 body.env-dr div#login p#backtoblog {
     display: none;
 }
+
+input[type=submit].button.button-primary {
+    background: #353cc1;
+    border-color: #252a86;
+}

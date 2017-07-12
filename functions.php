@@ -135,6 +135,8 @@ add_action( 'login_enqueue_scripts', function() {
 
 add_action( 'login_body_class', function() {
     $env = @$_ENV['WP_ENV'];
-    return ["env-${env}"];
+    $locale = "locale-" . sanitize_html_class( strtolower( str_replace( '_', '-', get_locale() ) ) );
+
+    return ["env-${env}", "login-action-login", "wp-core-ui", $locale];
 })
 ?>
