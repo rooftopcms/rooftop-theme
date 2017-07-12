@@ -1,0 +1,25 @@
+div#login h1 a {
+    background-image: url('logo-rooftop-260x260.png');
+    background-size: 200px 200px;
+    width: 260px;
+    height: 210px;
+}
+
+body.env-dr div#login {
+    width: 600px;
+}
+
+body.env-dr div#login .notice.notice-warning {
+    background: #fff;
+    border: 1px solid #ddd;
+    border-left: 3px solid #d39323;
+}
+
+body.env-dr div#login form[name=loginform] {
+    display: none;
+}
+
+body.env-dr div#login p#nav,
+body.env-dr div#login p#backtoblog {
+    display: none;
+}

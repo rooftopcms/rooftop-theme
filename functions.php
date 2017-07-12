@@ -128,4 +128,13 @@ class RooftopCMS {
         }
     }
 }
+
+add_action( 'login_enqueue_scripts', function() {
+    wp_enqueue_style( 'rooftop-login', get_stylesheet_directory_uri() . '/rooftop-login.css' );
+} );
+
+add_action( 'login_body_class', function() {
+    $env = @$_ENV['WP_ENV'];
+    return ["env-${env}"];
+})
 ?>
