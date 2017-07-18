@@ -10,8 +10,8 @@
  * Learn more: {@link https://codex.wordpress.org/Template_Hierarchy}
  *
  * @package WordPress
- * @subpackage Twenty_Fifteen
- * @since Twenty Fifteen 1.0
+ * @subpackage RooftopCMS
+ * @since RooftopCMS 1.0
  */
 ?>
 
