@@ -2,9 +2,9 @@
 Contributors: The Rooftop CMS team
 Requires at least: WordPress 4.1
 Tested up to: WordPress 4.3-trunk
-Version: 1.0
-License: GPLv2 or later
-License URI: http://www.gnu.org/licenses/gpl-2.0.html
+Version: 1.2.1
+License: GPLv3 or later
+License URI: http://www.gnu.org/licenses/gpl-3.0.html
 Tags: rooftop
 
 == Description ==
@@ -39,7 +39,14 @@ GNU General Public License for more details.
 
 == Changelog ==
 
-= 1.0 =
-* Released: ...
+= 1.2.1 =
+* Tweak readme for packaging
 
-Initial release
+= 1.2.0 =
+* Add empty template files to be detected as valid WP theme
+
+= 1.1 =
+* Bug fixes
+
+= 1.0 =
+* initial release
