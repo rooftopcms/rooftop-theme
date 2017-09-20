@@ -8,12 +8,6 @@ function setup() {
         'footer'  => __('Footer Menu', 'rooftopcms'),
     ));
 
-    // set the default Rooftop cache time (configured here rather than in the plugin itself which should have a generic config)
-    add_filter('rooftop_response_header_options', function($options) {
-        $options['cache_max_age_seconds'] = 60*10; // 10 mins
-        return $options;
-    });
-
     // FIXME: move these rest_query_vars filters into the rooftop-request-parser plugin
     add_filter( 'rest_query_vars', function( $valid_vars ) {
         $valid_vars = array_merge( $valid_vars, array( 'post__in', 'post__not_in' ) );
