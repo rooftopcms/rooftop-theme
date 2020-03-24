@@ -20,7 +20,12 @@ function setup() {
 
         return $valid_vars;
     });
+
+    add_action( 'wp_loaded', function() {
+        define( 'DISALLOW_FILE_MODS', true );
+    } );
 }
+
 setup();
 
 use ICanBoogie\Inflector;
