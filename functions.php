@@ -137,5 +137,35 @@ add_action( 'login_body_class', function() {
     $locale = "locale-" . sanitize_html_class( strtolower( str_replace( '_', '-', get_locale() ) ) );
 
     return ["env-${env}", "login-action-login", "wp-core-ui", $locale];
-})
+});
+
+function acf_load_navigation_menu_choices( $field ) {
+    $field['choices'] = array();
+
+    foreach( wp_get_nav_menus() as $menu ) {
+        $field['choices'][$menu->term_id] = $menu->name;
+    }
+
+    return $field;
+}
+add_filter('acf/load_field/name=venue_navigation_menu_id', 'acf_load_navigation_menu_choices');
+
+function make_relative(  $url, $post ) {
+    $url = wp_make_link_relative($url);
+    return $url;
+}
+
+// make links relative in the content editor
+add_action( 'init', function() {
+    $types = get_post_types( array( 'public' => true, 'show_in_graphql' => true ) );
+
+    foreach( $types as $type ) {
+        if( $type == "attachment") continue; // make_relative doesn't work with the 'attachment' content type
+
+        add_filter( $type.'_link', 'make_relative', 10, 2 );
+    }
+}, 1000);
+
+add_filter( 'post_type_link', 'make_relative', 10, 2);
+
 ?>
