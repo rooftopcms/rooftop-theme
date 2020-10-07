@@ -168,4 +168,12 @@ add_action( 'init', function() {
 
 add_filter( 'post_type_link', 'make_relative', 10, 2);
 
+add_filter( 'acf/location/rule_match/page_template', function($result, $rule, $screen, $field_group) {
+    // if we're GET'ing, return the result from the acf helper
+    if( $_SERVER['REQUEST_METHOD'] === 'GET' ) {
+        return $result;
+    }
+    return true;
+}, 10, 4 );
+
 ?>
