@@ -176,4 +176,9 @@ add_filter( 'acf/location/rule_match/page_template', function($result, $rule, $s
     return true;
 }, 10, 4 );
 
+function my_acf_init() {
+	acf_update_setting('google_api_key', @$_ENV['GOOGLE_MAPS_API_KEY']);
+}
+add_action('acf/init', 'my_acf_init');
+
 ?>
