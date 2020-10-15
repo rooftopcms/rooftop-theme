@@ -181,4 +181,55 @@ function my_acf_init() {
 }
 add_action('acf/init', 'my_acf_init');
 
+add_action( 'graphql_register_types', function() {
+    register_graphql_field( 'RootQueryToEventConnectionWhereArgs', 'venueId', [
+        'type' => 'Int',
+        'description' => 'Event Venue ID'
+    ] );
+
+    register_graphql_field( 'RootQueryToEventConnectionWhereArgs', 'audienceTypeId', [
+        'type' => 'Int',
+        'description' => 'Audience Type ID'
+    ] );
+
+    register_graphql_field( 'RootQueryToEventConnectionWhereArgs', 'eventTypeId', [
+        'type' => 'Int',
+        'description' => 'Event Type ID'
+    ] );
+}, 10 );
+
+add_filter( 'graphql_post_object_connection_query_args', function( $query_args, $source, $args, $context, $info) {
+    $meta_queries = [];
+
+    if( isset($query_args['venueId']) ) {
+        $meta_queries[] = [
+            'key' => 'venue',
+            'value' => $query_args['venueId'],
+            'compare' => '='
+        ];
+    }
+
+    if( isset($query_args['audienceTypeId']) ) {
+        //$meta_queries[] = [];
+    }
+    
+
+    if( isset($query_args['eventTypeId']) ) {
+        //$meta_queries[] = [];
+    }
+
+    if( count( $meta_queries ) > 0 ) {
+        $query_args['meta_query'] = [
+            'relation' => 'OR',
+        ];
+
+        array_map( function( $mq ) use (&$query_args) {
+            $query_args['meta_query'][] = $mq;
+        }, $meta_queries );
+    }
+
+    return $query_args;
+}, 10, 5);
+
 ?>
+
