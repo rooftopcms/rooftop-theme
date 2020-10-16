@@ -182,17 +182,17 @@ function my_acf_init() {
 add_action('acf/init', 'my_acf_init');
 
 add_action( 'graphql_register_types', function() {
-    register_graphql_field( 'RootQueryToEventConnectionWhereArgs', 'venueId', [
+    register_graphql_field( 'RootQueryToEventConnectionWhereArgs', 'venue', [
         'type' => 'Int',
         'description' => 'Event Venue ID'
     ] );
 
-    register_graphql_field( 'RootQueryToEventConnectionWhereArgs', 'audienceTypeId', [
+    register_graphql_field( 'RootQueryToEventConnectionWhereArgs', 'audience', [
         'type' => 'Int',
         'description' => 'Audience Type ID'
     ] );
 
-    register_graphql_field( 'RootQueryToEventConnectionWhereArgs', 'eventTypeId', [
+    register_graphql_field( 'RootQueryToEventConnectionWhereArgs', 'type', [
         'type' => 'Int',
         'description' => 'Event Type ID'
     ] );
@@ -201,20 +201,20 @@ add_action( 'graphql_register_types', function() {
 add_filter( 'graphql_post_object_connection_query_args', function( $query_args, $source, $args, $context, $info) {
     $meta_queries = [];
 
-    if( isset($query_args['venueId']) ) {
+    if( isset($query_args['venue']) ) {
         $meta_queries[] = [
             'key' => 'venue',
-            'value' => $query_args['venueId'],
+            'value' => $query_args['venue'],
             'compare' => '='
         ];
     }
 
-    if( isset($query_args['audienceTypeId']) ) {
+    if( isset($query_args['audience']) ) {
         //$meta_queries[] = [];
     }
     
 
-    if( isset($query_args['eventTypeId']) ) {
+    if( isset($query_args['type']) ) {
         //$meta_queries[] = [];
     }
 
@@ -230,6 +230,4 @@ add_filter( 'graphql_post_object_connection_query_args', function( $query_args, 
 
     return $query_args;
 }, 10, 5);
-
 ?>
-
