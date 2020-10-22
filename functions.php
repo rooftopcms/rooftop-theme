@@ -182,52 +182,114 @@ function my_acf_init() {
 add_action('acf/init', 'my_acf_init');
 
 add_action( 'graphql_register_types', function() {
+    register_graphql_field( 'RootQueryToEventConnectionWhereArgs', 'date', [
+        'type' => 'String',
+        'description' => 'Event Date'
+    ] );
+
     register_graphql_field( 'RootQueryToEventConnectionWhereArgs', 'venue', [
         'type' => 'Int',
         'description' => 'Event Venue ID'
     ] );
 
-    register_graphql_field( 'RootQueryToEventConnectionWhereArgs', 'audience', [
+    register_graphql_field( 'RootQueryToEventConnectionWhereArgs', 'audience_type', [
         'type' => 'Int',
-        'description' => 'Audience Type ID'
+        'description' => 'Audience Type'
     ] );
 
-    register_graphql_field( 'RootQueryToEventConnectionWhereArgs', 'type', [
+    register_graphql_field( 'RootQueryToEventConnectionWhereArgs', 'event_type', [
         'type' => 'Int',
-        'description' => 'Event Type ID'
+        'description' => 'Event Type'
     ] );
 }, 10 );
 
 add_filter( 'graphql_post_object_connection_query_args', function( $query_args, $source, $args, $context, $info) {
     $meta_queries = [];
+    $date_queries = [];
+    $parent_condition = 'OR';
+
+    if( isset($query_args['date']) ) {
+        $parent_condition = 'AND';
+        
+        $date_queries = [
+            [
+                'relation' => 'OR', 
+                [
+                    'relation' => 'AND',
+                    [
+                        'key' => 'start_date',
+                        'value' => $query_args['date'] . ' 00:00:00',
+                        'type' => 'DATE',
+                        'compare' => '<='
+                    ],
+                    [
+                        'key' => 'end_date',
+                        'value' => $query_args['date'] . ' 00:00:00',
+                        'type' => 'DATE',
+                        'compare' => '>='
+                    ]
+                ],
+                [
+                    'relation' => 'AND',
+                    [
+                        'key' => 'start_date',
+                        'value' => $query_args['date'] . ' 00:00:00',
+                        'type' => 'DATE',
+                        'compare' => '>='
+                    ], 
+                ]
+            ]
+        ];
+    }
+
+    if( isset($query_args['audience_type']) ) {
+        $meta_queries[] = [
+            'key' => 'audience_type',
+            'value' => $query_args['audience_type'],
+            'compare' => 'LIKE'
+        ];
+    }
+    
+    if( isset($query_args['event_type']) ) {
+        $meta_queries[] = [
+            'key' => 'event_type',
+            'value' => $query_args['event_type'],
+            'compare' => 'LIKE'
+        ];
+    }
 
     if( isset($query_args['venue']) ) {
         $meta_queries[] = [
             'key' => 'venue',
             'value' => $query_args['venue'],
-            'compare' => '='
+            'compare' => 'LIKE'
         ];
-    }
-
-    if( isset($query_args['audience']) ) {
-        //$meta_queries[] = [];
-    }
-    
-
-    if( isset($query_args['type']) ) {
-        //$meta_queries[] = [];
     }
 
     if( count( $meta_queries ) > 0 ) {
-        $query_args['meta_query'] = [
-            'relation' => 'OR',
+        $filter_queries = [
+            'relation' => 'OR'
         ];
 
-        array_map( function( $mq ) use (&$query_args) {
-            $query_args['meta_query'][] = $mq;
+        array_map( function( $mq ) use (&$filter_queries) {
+            $filter_queries[] = $mq;
         }, $meta_queries );
+
+        $query_args['meta_query'][] = $filter_queries;
+
+        $query_args['meta_query']['relation'] = $parent_condition;
+
+        if( count( $date_queries ) > 0 ) {
+            $query_args['meta_query'][] = $date_queries;
+        }
+    }else if( $date_queries ) {
+        $query_args['meta_query'][] = $date_queries;
     }
+
+        // wp_send_json( get_posts( $query_args ) );
+        // wp_send_json( $query_args['meta_query'] );
 
     return $query_args;
 }, 10, 5);
+
 ?>
