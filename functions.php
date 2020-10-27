@@ -176,10 +176,30 @@ add_filter( 'acf/location/rule_match/page_template', function($result, $rule, $s
     return true;
 }, 10, 4 );
 
-function my_acf_init() {
+function derby_acf_init() {
 	acf_update_setting('google_api_key', @$_ENV['GOOGLE_MAPS_API_KEY']);
 }
-add_action('acf/init', 'my_acf_init');
+add_action('acf/init', 'derby_acf_init');
+
+if( function_exists('acf_add_options_page') ) {
+    acf_add_options_page(array(
+		'page_title' 	=> 'Header Settings',
+		'menu_title'	=> 'Header Settings',
+		'menu_slug' 	=> 'header-settings',
+		'capability'	=> 'edit_posts',
+        'redirect'		=> false,
+        'show_in_graphql' => true
+    ));
+    
+	acf_add_options_page(array(
+		'page_title' 	=> 'Footer Settings',
+		'menu_title'	=> 'Footer Settings',
+		'menu_slug' 	=> 'footer-settings',
+		'capability'	=> 'edit_posts',
+        'redirect'		=> false,
+        'show_in_graphql' => true
+    ));
+}
 
 add_action( 'graphql_register_types', function() {
     register_graphql_field( 'RootQueryToEventConnectionWhereArgs', 'date', [
