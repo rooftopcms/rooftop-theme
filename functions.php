@@ -187,6 +187,11 @@ add_action( 'graphql_register_types', function() {
         'description' => 'Event Date'
     ] );
 
+    register_graphql_field( 'RootQueryToEventConnectionWhereArgs', 'upcoming', [
+        'type' => 'Boolean',
+        'description' => 'Only show upcoming events'
+    ] );
+
     register_graphql_field( 'RootQueryToEventConnectionWhereArgs', 'venue', [
         'type' => 'Int',
         'description' => 'Event Venue ID'
@@ -207,6 +212,10 @@ add_filter( 'graphql_post_object_connection_query_args', function( $query_args, 
     $meta_queries = [];
     $date_queries = [];
     $parent_condition = 'OR';
+
+    if( !isset($query_args['date']) && isset($query_args['upcoming'] )) {
+        $query_args['date'] = date("Y-m-d");
+    }
 
     if( isset($query_args['date']) ) {
         $parent_condition = 'AND';
