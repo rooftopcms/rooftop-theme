@@ -297,7 +297,7 @@ add_filter( 'graphql_post_object_connection_query_args', function( $query_args, 
 
     if( count( $meta_queries ) > 0 ) {
         $filter_queries = [
-            'relation' => 'OR'
+            'relation' => 'AND'
         ];
 
         array_map( function( $mq ) use (&$filter_queries) {
