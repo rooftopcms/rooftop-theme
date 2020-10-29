@@ -321,4 +321,47 @@ add_filter( 'graphql_post_object_connection_query_args', function( $query_args, 
     return $query_args;
 }, 10, 5);
 
+// Give editors access to menus
+
+function editor_menus() {
+    $user = wp_get_current_user();
+   
+    if ( in_array( 'editor', (array) $user->roles ) ) {
+        
+        if ( ! current_user_can( 'edit_theme_options' ) ) {
+            $role_object = get_role( 'editor' );
+            $role_object->add_cap( 'edit_theme_options' );
+        }
+        
+        remove_submenu_page( 'themes.php', 'themes.php' );
+        remove_submenu_page( 'themes.php', 'widgets.php' );
+        remove_submenu_page( 'themes.php', 'customize.php' );
+
+        global $submenu;
+        unset($submenu['themes.php'][6]);
+    }
+}
+
+add_action('admin_menu', 'editor_menus', 10);
+
+// remove pos_type Post everywhere
+
+add_action( 'admin_menu', 'remove_default_post_type' );
+
+function remove_default_post_type() {
+    remove_menu_page( 'edit.php' );
+}
+
+add_action( 'admin_bar_menu', 'remove_default_post_type_menu_bar', 999 );
+
+function remove_default_post_type_menu_bar( $wp_admin_bar ) {
+    $wp_admin_bar->remove_node( 'new-post' );
+}
+
+add_action( 'wp_dashboard_setup', 'remove_draft_widget', 999 );
+
+function remove_draft_widget(){
+    remove_meta_box( 'dashboard_quick_press', 'dashboard', 'side' );
+}
+
 ?>
