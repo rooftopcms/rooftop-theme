@@ -1,6 +1,6 @@
 <?php
 function setup() {
-    add_theme_support( 'post-thumbnails' );
+    // add_theme_support( 'post-thumbnails' );
     set_post_thumbnail_size( 825, 510, true );
 
     register_nav_menus( array(
