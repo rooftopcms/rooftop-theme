@@ -364,4 +364,14 @@ function remove_draft_widget(){
     remove_meta_box( 'dashboard_quick_press', 'dashboard', 'side' );
 }
 
+add_filter( 'acf/load_value/type=relationship', function( $value, $post_id, $field ) {
+    if( !$value ) return [];
+
+    $posts = get_posts( ['post_type' => 'any', 'post__in' => $value ]);
+
+    return array_map( function($post ) {
+        return $post->ID;
+    }, $posts );
+}, 10, 3);
+
 ?>
