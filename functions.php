@@ -366,10 +366,10 @@ function remove_draft_widget(){
 
 add_filter( 'acf/load_value/type=relationship', function( $value, $post_id, $field ) {
     if( !$value ) return [];
+    
+    $posts = get_posts( ['posts_per_page' => -1, 'post_type' => 'any', 'post__in' => $value, 'orderby' => 'post__in' ]);
 
-    $posts = get_posts( ['posts_per_page' => -1, 'post_type' => 'any', 'post__in' => $value ]);
-
-    return array_map( function($post ) {
+    return array_map( function( $post ) {
         return $post->ID;
     }, $posts );
 }, 10, 3);
