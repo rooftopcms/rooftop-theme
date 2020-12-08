@@ -229,13 +229,13 @@ add_action( 'graphql_register_types', function() {
 }, 10 );
 
 add_filter( 'graphql_post_object_connection_query_args', function( $query_args, $source, $args, $context, $info) {
-    if( !in_array( 'events', $source ) ) return $query_args;
+    if( !in_array( 'event', $query_args['post_type'] ) ) return $query_args;
     
     $meta_queries = [];
     $date_queries = [];
     $parent_condition = 'OR';
 
-    if( !isset($query_args['date']) && isset($query_args['upcoming'] )) {
+    if( !isset($query_args['date']) ) {
         $query_args['date'] = date("Y-m-d");
     }
 
