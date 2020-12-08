@@ -233,7 +233,7 @@ add_filter( 'graphql_post_object_connection_query_args', function( $query_args, 
     $date_queries = [];
     $parent_condition = 'OR';
 
-    if( !isset($query_args['date']) && isset($query_args['upcoming'] )) {
+    if( !isset($query_args['date']) ) {
         $query_args['date'] = date("Y-m-d");
     }
 
@@ -246,13 +246,13 @@ add_filter( 'graphql_post_object_connection_query_args', function( $query_args, 
                 [
                     'relation' => 'AND',
                     [
-                        'key' => 'start_date',
+                        'key' => 'event_dates_$_start_date',
                         'value' => $query_args['date'] . ' 00:00:00',
                         'type' => 'DATE',
                         'compare' => '<='
                     ],
                     [
-                        'key' => 'end_date',
+                        'key' => 'event_dates_$_end_date',
                         'value' => $query_args['date'] . ' 00:00:00',
                         'type' => 'DATE',
                         'compare' => '>='
@@ -261,7 +261,7 @@ add_filter( 'graphql_post_object_connection_query_args', function( $query_args, 
                 [
                     'relation' => 'AND',
                     [
-                        'key' => 'start_date',
+                        'key' => 'event_dates_$_start_date',
                         'value' => $query_args['date'] . ' 00:00:00',
                         'type' => 'DATE',
                         'compare' => '>='
@@ -315,14 +315,17 @@ add_filter( 'graphql_post_object_connection_query_args', function( $query_args, 
         $query_args['meta_query'][] = $date_queries;
     }
 
-        // wp_send_json( get_posts( $query_args ) );
-        // wp_send_json( $query_args['meta_query'] );
+//    wp_send_json( get_posts( $query_args ) );
+//    wp_send_json( $query_args );
 
     return $query_args;
 }, 10, 5);
 
-// Give editors access to menus
+add_filter( 'posts_where', function( $where ) {
+    return str_replace( "meta_key = 'event_dates_$", "meta_key LIKE 'event_dates_%", $where );
+}, 10, 1);
 
+// Give editors access to menus
 function editor_menus() {
     $user = wp_get_current_user();
    
@@ -366,7 +369,7 @@ function remove_draft_widget(){
 
 add_filter( 'acf/load_value/type=relationship', function( $value, $post_id, $field ) {
     if( !$value ) return [];
-    
+
     $posts = get_posts( ['posts_per_page' => -1, 'post_type' => 'any', 'post__in' => $value, 'orderby' => 'post__in' ]);
 
     return array_map( function( $post ) {
