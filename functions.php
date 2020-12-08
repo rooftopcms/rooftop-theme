@@ -170,11 +170,18 @@ add_filter( 'post_type_link', 'make_relative', 10, 2);
 
 add_filter( 'acf/location/rule_match/page_template', function($result, $rule, $screen, $field_group) {
     // if we're GET'ing, return the result from the acf helper
-    if( isset($screen['wp-graphql-acf']) && $screen['wp-graphql-acf'] == true ) {
-        return true;
+    $acf_screen = isset($screen['wp-graphql-acf']) && $screen['wp-graphql-acf'] == true;
+    // if( $acf_screen ) {
+    //     return true;
+    // }elseif( $_SERVER['REQUEST_METHOD'] === 'GET' ) {
+    //     return $result;
+    // }
+
+    if( $_SERVER['REQUEST_METHOD'] !== 'POST') {
+        return $result;
     }
 
-    return $result;
+    return true;
 }, 10, 4 );
 
 function derby_acf_init() {
