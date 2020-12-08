@@ -170,10 +170,11 @@ add_filter( 'post_type_link', 'make_relative', 10, 2);
 
 add_filter( 'acf/location/rule_match/page_template', function($result, $rule, $screen, $field_group) {
     // if we're GET'ing, return the result from the acf helper
-    if( $_SERVER['REQUEST_METHOD'] === 'GET' ) {
-        return $result;
+    if( isset($screen['wp-graphql-acf']) && $screen['wp-graphql-acf'] == true ) {
+        return true;
     }
-    return true;
+
+    return $result;
 }, 10, 4 );
 
 function derby_acf_init() {
@@ -235,7 +236,7 @@ add_filter( 'graphql_post_object_connection_query_args', function( $query_args, 
     $date_queries = [];
     $parent_condition = 'OR';
 
-    if( !isset($query_args['date']) ) {
+    if( !isset($query_args['date']) && isset($query_args['upcoming'] )) {
         $query_args['date'] = date("Y-m-d");
     }
 
