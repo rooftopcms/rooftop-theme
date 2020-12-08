@@ -169,19 +169,14 @@ add_action( 'init', function() {
 add_filter( 'post_type_link', 'make_relative', 10, 2);
 
 add_filter( 'acf/location/rule_match/page_template', function($result, $rule, $screen, $field_group) {
-    // if we're GET'ing, return the result from the acf helper
-    $acf_screen = isset($screen['wp-graphql-acf']) && $screen['wp-graphql-acf'] == true;
-    // if( $acf_screen ) {
-    //     return true;
-    // }elseif( $_SERVER['REQUEST_METHOD'] === 'GET' ) {
-    //     return $result;
-    // }
+//    $out = fopen('php://stdout', 'w');
+//    fwrite($out, "\n\n\nREQUEST_URI ${_SERVER['REQUEST_URI']} - ${result}\n\n\n" );
 
-    if( $_SERVER['REQUEST_METHOD'] !== 'POST') {
-        return $result;
+    if( $_SERVER['REQUEST_URI'] === '/graphql' ) {
+        return true;
     }
 
-    return true;
+    return $result;
 }, 10, 4 );
 
 function derby_acf_init() {
