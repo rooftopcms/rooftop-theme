@@ -241,6 +241,7 @@ add_filter( 'graphql_post_object_connection_query_args', function( $query_args, 
     if( !isset($query_args['date']) && isset($query_args['upcoming'] )) {
         $query_args['date'] = date("Y-m-d");
     }
+    
 
     if( isset($query_args['date']) ) {
         $parent_condition = 'AND';
@@ -318,11 +319,13 @@ add_filter( 'graphql_post_object_connection_query_args', function( $query_args, 
         }
     }else if( $date_queries ) {
         $query_args['meta_query'][] = $date_queries;
+        $query_args['meta_key'] = 'event_dates_$_start_date';
+        $query_args['orderby'] = 'meta_value';
+        $query_args['order'] = 'ASC';
     }
 
-//    wp_send_json( get_posts( $query_args ) );
-//    wp_send_json( $query_args );
-
+    // wp_send_json( get_posts( $query_args ) );
+    // wp_send_json( $query_args );
     return $query_args;
 }, 10, 5);
 
