@@ -150,6 +150,106 @@ function acf_load_navigation_menu_choices( $field ) {
 }
 add_filter('acf/load_field/name=venue_navigation_menu_id', 'acf_load_navigation_menu_choices');
 
+add_filter('graphql_process_http_request_response', function( $response, $result, $queryName, $query, $vars ) {
+    if( $queryName != "EventQuery" ) return $result;
+
+    $dates = [
+        array("startDate" => "11 September 2020"),
+        array("startDate" => "10 September 2020"),
+        array("startDate" => "11 September 2021"),
+        array("startDate" => "14 September 2020"),
+        array("startDate" => "11 September 2020"),
+    ];
+
+    $dateFilter = function( $date ) {
+        return DateTime::createFromFormat("j M Y", $date["startDate"] ) > new DateTime();
+    };
+
+    $dateSort = function( $a, $b ) {
+        $date_a = DateTime::createFromFormat("j M Y", $a["startDate"] );
+        $date_b = DateTime::createFromFormat("j M Y", $b["startDate"] );
+
+        return $date_a > $date_b;
+    };
+
+    $eventSort = function( $a, $b ) use ($dateSort, $dateFilter) {
+        usort( $a["event_fields"]["eventDates"], $dateSort );
+        usort( $b["event_fields"]["eventDates"], $dateSort );
+
+        $event_a_date = array_filter( $a["event_fields"]["eventDates"], $dateFilter )[0];
+        $event_b_date = array_filter( $b["event_fields"]["eventDates"], $dateFilter )[0];
+
+        return $event_a_date < $event_b_date;
+    };
+
+    usort( $result->data['events']['results'], $eventSort );
+}, 10, 5);
+
+// add_filter('graphql_process_http_request_response', function( $response, $result, $queryName, $query, $vars ) {
+    // if( array_key_exists('events', $result->data) && count( $result->data['events'] ) && count( $result->data['events']['results']) ) {
+        // print_r('got event data');
+        // print_r($result->toArray());
+        /* given this response structure, filter and re-order the entries so that any startDates (that have matching endDates)
+        are filtered out if they're in the past, and then the whole set is sorted based on the next upcoming date instance (or first date 
+        instance if there are none, but there shouldn't be as our graphql_post_object_connection_query_args filter can query for upcoming events)
+
+        $dateFilter = function( $date ) {
+            return strtotime( $a["startDate"] ) > new Date();
+        }
+
+        $dateSort = function( $a, $b ) {
+            $date_a = strtotime( $a["startDate"] );
+            $date_b = strtotime( $b["startDate"] );
+
+            return $date_a < $date_b;
+        };
+
+        $eventSort = function( $a, $b ) {
+            $event_a_sorted = $dateSort( $a["event_fields"]["eventDates"] );
+            $event_b_sorted = $dateSort( $a["event_fields"]["eventDates"] );
+
+            $event_a_date = $dateFilter( $event_a_sorted )[0];
+            $event_b_date = $dateFilter( $event_b_sorted )[0];
+
+            return $event_a_date < $event_b_date;
+        }
+
+        {
+        "data": {
+            "events": {
+            "results": [
+                {
+                    "event_fields": {
+                        "eventDates": [
+                            {
+                                "startDate": "2 February 2021"
+                            },
+                            {
+                                "startDate": "5 February 2021"
+                            },
+                            {
+                                "startDate": "16 February 2021"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "event_fields": {
+                        "eventDates": [
+                            {
+                                "startDate": "4 February 2021"
+                            }
+                        ]
+                    }
+                },
+            }
+        }
+        */
+//     }
+    
+//     return $result;
+// }, 10, 5);
+
 function make_relative(  $url, $post ) {
     $url = wp_make_link_relative($url);
     return $url;
@@ -250,13 +350,16 @@ add_filter( 'graphql_post_object_connection_query_args', function( $query_args, 
             [
                 'relation' => 'OR', 
                 [
-                    'relation' => 'AND',
-                    [
-                        'key' => 'event_dates_$_start_date',
-                        'value' => $query_args['date'] . ' 00:00:00',
-                        'type' => 'DATE',
-                        'compare' => '<='
-                    ],
+                    // with the additional nested conditon (which checks for start dates in the past, as well as end 
+                    // dates in the future) the queries take much longer to perform (from 0.5secs up to 6 - 7 seconds)
+                    // 
+                    // 'relation' => 'AND',
+                    // [
+                    //     'key' => 'event_dates_$_start_date',
+                    //     'value' => $query_args['date'] . ' 00:00:00',
+                    //     'type' => 'DATE',
+                    //     'compare' => '<='
+                    // ],
                     [
                         'key' => 'event_dates_$_end_date',
                         'value' => $query_args['date'] . ' 00:00:00',
@@ -265,7 +368,6 @@ add_filter( 'graphql_post_object_connection_query_args', function( $query_args, 
                     ]
                 ],
                 [
-                    'relation' => 'AND',
                     [
                         'key' => 'event_dates_$_start_date',
                         'value' => $query_args['date'] . ' 00:00:00',
